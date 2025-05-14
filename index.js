@@ -3,7 +3,7 @@ const fs = require('fs');
 const chalk = require('chalk');
 
 // Initialize Web3 first
-const web3 = new Web3.providers.HttpProvider('https://evmrpc-testnet.0g.ai'));
+const web3 = new Web3(new Web3.providers.HttpProvider('https://evmrpc-testnet.0g.ai'));
 
 // Token configuration
 const TOKENS = [
