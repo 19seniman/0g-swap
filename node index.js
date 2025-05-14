@@ -63,47 +63,6 @@
        }
    ];
 
-// Constants
-const ROUTER_ADDRESS = '0xb95B5953FF8ee5D5d9818CdbEfE363ff2191318c';
-const POOL_FEE = 3000;
-const DEADLINE = Math.floor(Date.now() / 1000) + 60 * 10;
-const MAX_ALLOWANCE = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
-
-// ABI definitions
-const erc20ABI = [
-    {
-        "constant": true,
-        "inputs": [
-            {"name": "owner", "type": "address"},
-            {"name": "spender", "type": "address"}
-        ],
-        "name": "allowance",
-        "outputs": [{"name": "", "type": "uint256"}],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "constant": true,
-        "inputs": [{"name": "owner", "type": "address"}],
-        "name": "balanceOf",
-        "outputs": [{"name": "", "type": "uint256"}],
-        "payable": false,
-        "type": "function"
-    },
-    {
-        "constant": false,
-        "inputs": [
-            {"name": "spender", "type": "address"},
-            {"name": "amount", "type": "uint256"}
-        ],
-        "name": "approve",
-        "outputs": [{"name": "", "type": "bool"}],
-        "payable": false,
-        "stateMutability": "nonpayable",
-        "type": "function"
-    }
-];
 
 const routerABI = [
     {
