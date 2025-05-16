@@ -3,7 +3,8 @@ console.log(`
 
 
 
-             🍉🍉🍉     🍉🍉🍉      ~ 19Seniman From Insider - FREE PALESTINE ~    🍉🍉🍉  🍉🍉🍉
+             🍉🍉🍉    🍉🍉🍉      ~ 19Seniman From Insider - FREE PALESTINE ~    🍉🍉🍉  🍉🍉🍉
+
 
                  
 `);
