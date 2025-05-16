@@ -1,6 +1,5 @@
 console.clear();
-console.log(`
-<!DOCTYPE html>
+console.log(`<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -27,20 +26,14 @@ console.log(`
     </style>
 </head>
 <body>
-
     <img id="logo" src="path/to/your/logo.png" alt="Velocity Logo">
     <h1 id="title">VELOCITY</h1>
-
     <script>
-        // JavaScript can be used to manipulate the DOM
         const titleElement = document.getElementById('title');
         titleElement.style.color = 'red'; // Change title color if desired
     </script>
-
 </body>
-</html>
-
-`);
+</html>`);
 
 require('dotenv').config();
 const { ethers } = require('ethers');
