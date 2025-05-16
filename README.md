@@ -1,4 +1,4 @@
-# Zer0 Dex Auto From Airdrop Sambil Rebahan
+
 
 ![Zer0-Dex](https://raw.githubusercontent.com/yonarebahan/Zer0-Dex-Auto/main/Untitled.png)
 
