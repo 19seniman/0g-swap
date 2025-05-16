@@ -1,24 +1,45 @@
 console.clear();
 console.log(`
-                      .^!!^.
-                  .:~7?7!7??7~:.
-               :^!77!~:..^^~7?J?!^.
-           .^!7??!^..  ..^^^^^~JJJJ7~:.
-           7?????: ...^!7?!^^^~JJJJJJJ?.
-           7?????:...^???J7^^^~JJJJJJJJ.
-           7?????:...^??7?7^^^~JJJJJJJ?.
-           7?????:...^~:.^~^^^~JJJJJJJ?.
-           7?????:.. .:^!7!~^^~7?JJJJJ?.
-           7?????:.:~JGP5YJJ?7!^^~7?JJ?.
-           7?7?JY??JJ5BBBBG5YJJ?7!~7JJ?.
-           7Y5GBBYJJJ5BBBBBBBGP5Y5PGP5J.
-           ^?PBBBP555PBBBBBBBBBBBB#BPJ~
-              :!YGB#BBBBBBBBBBBBGY7^
-                 .~?5BBBBBBBBPJ~.
-                     :!YGGY7:
-                        ..
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Velocity Logo</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f9f9f9;
+        }
+        img {
+            max-width: 200px; /* Adjust size as needed */
+        }
+        h1 {
+            font-family: Arial, sans-serif;
+            font-size: 2.5em;
+            margin-top: 20px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
 
- 🚀 join channel Airdrop Sambil Rebahan : https://t.me/kingfeeder
+    <img id="logo" src="path/to/your/logo.png" alt="Velocity Logo">
+    <h1 id="title">VELOCITY</h1>
+
+    <script>
+        // JavaScript can be used to manipulate the DOM
+        const titleElement = document.getElementById('title');
+        titleElement.style.color = 'red'; // Change title color if desired
+    </script>
+
+</body>
+</html>
+
 `);
 
 require('dotenv').config();
