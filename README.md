@@ -11,7 +11,7 @@
 
 **Install Script**
 ```
-git https://github.com/19seniman/0g-swap.git
+git clone https://github.com/19seniman/0g-swap.git
 cd 0g-swap
 ```
 ```
