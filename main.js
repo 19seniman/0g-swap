@@ -1,39 +1,7 @@
 console.clear();
-console.log(`<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Velocity Logo</title>
-    <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            background-color: #f9f9f9;
-        }
-        img {
-            max-width: 200px; /* Adjust size as needed */
-        }
-        h1 {
-            font-family: Arial, sans-serif;
-            font-size: 2.5em;
-            margin-top: 20px;
-            color: #333;
-        }
-    </style>
-</head>
-<body>
-    <img id="logo" src="path/to/your/logo.png" alt="Velocity Logo">
-    <h1 id="title">VELOCITY</h1>
-    <script>
-        const titleElement = document.getElementById('title');
-        titleElement.style.color = 'red'; // Change title color if desired
-    </script>
-</body>
-</html>`);
+console.log(`
+                                                         ~ 19Seniman From Insider - FREE PALESTINE ~
+`);
 
 require('dotenv').config();
 const { ethers } = require('ethers');
