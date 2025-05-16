@@ -11,8 +11,8 @@
 
 **Install Script**
 ```
-git clone https://github.com/yonarebahan/Zer0-Dex-Auto.git
-cd Zer0-Dex-Auto
+git https://github.com/19seniman/0g-swap.git
+cd 0g-swap
 ```
 ```
 npm init -y
