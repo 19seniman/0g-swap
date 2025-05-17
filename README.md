@@ -37,10 +37,10 @@ Gunakan dengan bijak, semua risiko dan tanggung jawab ada di tangan pengguna.
 ## ☕ Donate for Coffee
 
 **EVM Address**  
-`0xE70Cfda5FE920d0439752D1Cc8081Ef58479aC85`
+`0xf01fb9a6855f175d3f3e28e00fa617009c38ef59`
 
-**SOL Address**  
-`J6qmkXTnngtWeK1JU5kHjfuRrnwgtiLN5QwsRdPjj27C`
+**via Dana**  
+`085830000502`
 
 ---
-© 2025 Airdrop Sambil Rebahan. All rights reserved.
+https://t.me/blockchainproject_19
