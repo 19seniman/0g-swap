@@ -2,6 +2,14 @@
 
 ![Zer0-Dex](https://raw.githubusercontent.com/yonarebahan/Zer0-Dex-Auto/main/Untitled.png)
 
+##  🍉 Donate for  watermelon
+
+**EVM Address**  
+`0xf01fb9a6855f175d3f3e28e00fa617009c38ef59`
+
+**via Dana**  
+`085830000502`
+
 # Fitur
 - Swap token acak (ETH, BTC, USDT)
 - Add liquidity acak ke berbagai pasangan
