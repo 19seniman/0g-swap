@@ -92,6 +92,11 @@ function getRandomDelay(minSec = 10, maxSec = 20) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+// Fungsi untuk mendapatkan nonce saat ini dari wallet
+async function getCurrentNonce(wallet) {
+  return await wallet.provider.getTransactionCount(wallet.address, 'latest');
+}
+
 async function main() {
   const swapCount = parseInt(process.env.SWAP_COUNT || '3', 10);
 
@@ -108,6 +113,9 @@ async function main() {
 
     const router = new ethers.Contract(routerAddress, routerAbi, wallet);
     const dex = new ethers.Contract(zer0dexAddress, zer0dexAbi, wallet);
+
+    // Dapatkan nonce awal untuk wallet ini
+    let currentNonce = await getCurrentNonce(wallet);
 
     // === SWAP ===
     for (let i = 0; i < swapCount; i++) {
@@ -128,8 +136,15 @@ async function main() {
       const allowance = await token.allowance(walletAddress, routerAddress);
       if (allowance < amountIn) {
         console.log(`Approving ${fromToken.symbol}...`);
-        const approveTx = await token.approve(routerAddress, amountIn);
-        await approveTx.wait();
+        try {
+          const approveTx = await token.approve(routerAddress, amountIn, { nonce: currentNonce++ }); // Gunakan nonce dan tingkatkan
+          await approveTx.wait();
+          console.log(`✅ Approve Success! Tx Hash: ${approveTx.hash}`);
+        } catch (err) {
+          console.error(`❌ Gagal approve ${fromToken.symbol}:`, err?.shortMessage || err);
+          // Mungkin perlu mencoba lagi atau skip transaksi ini jika approve gagal
+          continue; 
+        }
       }
 
       const deadline = Math.floor(Date.now() / 1000) + 600;
@@ -148,11 +163,22 @@ async function main() {
       console.log(`\u{1F501} Swap ${fromToken.symbol} → ${toToken.symbol} | Amount: ${ethers.formatUnits(amountIn, decimals)}`);
 
       try {
-        const tx = await router.exactInputSingle(params, { gasLimit: 300000n });
+        // Estimasi gas limit sebelum mengirim transaksi
+        const estimatedGas = await router.exactInputSingle.estimateGas(params);
+        // Tambahkan buffer ke gas limit yang diestimasi
+        const gasLimitWithBuffer = estimatedGas * 120n / 100n; // Tambah 20%
+        
+        const tx = await router.exactInputSingle(params, { gasLimit: gasLimitWithBuffer, nonce: currentNonce++ }); // Gunakan nonce dan tingkatkan
         const receipt = await tx.wait();
         console.log(`✅ Swap Success! Tx Hash: ${receipt.hash}`);
       } catch (err) {
         console.error(`❌ Gagal swap ${fromToken.symbol} → ${toToken.symbol}:`, err?.shortMessage || err);
+        // Jika ada error REPLACEMENT_UNDERPRICED, bisa coba tingkatkan gasPrice/maxFeePerGas
+        // Atau Anda mungkin ingin mendapatkan nonce terbaru lagi jika terjadi error yang tidak terduga
+        if (err.code === 'REPLACEMENT_UNDERPRICED') {
+            console.log("Mencoba mendapatkan nonce terbaru karena REPLACEMENT_UNDERPRICED...");
+            currentNonce = await getCurrentNonce(wallet);
+        }
       }
 
       await getRandomDelay();
@@ -190,8 +216,36 @@ async function main() {
       console.log(`→ ${pct0}% ${name0}: ${ethers.formatUnits(amt0, dec0)}`);
       console.log(`→ ${pct1}% ${name1}: ${ethers.formatUnits(amt1, dec1)}`);
 
-      await token0.approve(zer0dexAddress, amt0);
-      await token1.approve(zer0dexAddress, amt1);
+      try {
+        // Approve token0
+        const allowance0 = await token0.allowance(walletAddress, zer0dexAddress);
+        if (allowance0 < amt0) {
+            console.log(`[${r}] Approving ${name0}...`);
+            const approveTx0 = await token0.approve(zer0dexAddress, amt0, { nonce: currentNonce++ });
+            await approveTx0.wait();
+            console.log(`[${r}] ✅ Approve ${name0} Success! Tx Hash: ${approveTx0.hash}`);
+        } else {
+            console.log(`[${r}] ${name0} sudah di-approve.`);
+        }
+
+        // Approve token1
+        const allowance1 = await token1.allowance(walletAddress, zer0dexAddress);
+        if (allowance1 < amt1) {
+            console.log(`[${r}] Approving ${name1}...`);
+            const approveTx1 = await token1.approve(zer0dexAddress, amt1, { nonce: currentNonce++ });
+            await approveTx1.wait();
+            console.log(`[${r}] ✅ Approve ${name1} Success! Tx Hash: ${approveTx1.hash}`);
+        } else {
+            console.log(`[${r}] ${name1} sudah di-approve.`);
+        }
+      } catch (err) {
+        console.error(`[${r}] ❌ Gagal approve token untuk mint:`, err?.shortMessage || err);
+        if (err.code === 'REPLACEMENT_UNDERPRICED') {
+            console.log("Mencoba mendapatkan nonce terbaru karena REPLACEMENT_UNDERPRICED...");
+            currentNonce = await getCurrentNonce(wallet);
+        }
+        continue; // Skip mint jika approve gagal
+      }
 
       const deadline = Math.floor(Date.now() / 1000) + 300;
 
@@ -210,12 +264,20 @@ async function main() {
       ];
 
       try {
-        const tx = await dex.mint(mintParams, { gasLimit: 600000 });
+        // Estimasi gas limit sebelum mengirim transaksi mint
+        const estimatedGasMint = await dex.mint.estimateGas(mintParams);
+        const gasLimitMintWithBuffer = estimatedGasMint * 120n / 100n; // Tambah 20%
+
+        const tx = await dex.mint(mintParams, { gasLimit: gasLimitMintWithBuffer, nonce: currentNonce++ }); // Gunakan nonce dan tingkatkan
         console.log(`[${r}] 🚀 TX terkirim: ${tx.hash}`);
         await tx.wait();
         console.log(`[${r}] 🎉 Sukses!`);
       } catch (err) {
-        console.error(`[${r}] ❌ Gagal mint:`, err.message);
+        console.error(`[${r}] ❌ Gagal mint:`, err?.shortMessage || err);
+        if (err.code === 'REPLACEMENT_UNDERPRICED') {
+            console.log("Mencoba mendapatkan nonce terbaru karena REPLACEMENT_UNDERPRICED...");
+            currentNonce = await getCurrentNonce(wallet);
+        }
       }
 
       if (r < totalRuns) await getRandomDelay();
