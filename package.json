@@ -1,10 +1,10 @@
 {
-  "name": "zer0dex-bot",
+  "name": "zer0dex",
   "version": "1.0.0",
-  "description": "Bot swap dan liquidity di Zer0Dex",
+  "description": "swap dan Add liquidity on Zer0Dex",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node main.js"
   },
   "dependencies": {
     "dotenv": "^16.3.1",
