@@ -1,68 +1,37 @@
 const loggerTheme = {
-
   reset: "\x1b[0m",
-
   bold: "\x1b[1m",
-
   italic: "\x1b[3m",
-
   underline: "\x1b[4m",
-
   red: "\x1b[31m",
-
   green: "\x1b[32m",
-
   yellow: "\x1b[33m",
-
   blue: "\x1b[34m",
-
   magenta: "\x1b[35m",
-
   cyan: "\x1b[36m",
-
   white: "\x1b[37m",
-
   bgGray: "\x1b[100m",
-
 };
 
-
 const fancyBox = (title, subtitle) => {
-
   console.log(`${loggerTheme.cyan}${loggerTheme.bold}`);
-
   console.log('╔══════════════════════════════════════════════╗');
-
   console.log(`║  ${title.padEnd(42)}  ║`);
-
   if (subtitle) {
-
     console.log(`║  ${subtitle.padEnd(42)}  ║`);
-
   }
-
   console.log('╚══════════════════════════════════════════════╝');
-
   console.log(loggerTheme.reset);
-
 };
 
 const logger = {
-
   info: (msg) => console.log(`${loggerTheme.blue}[ ℹ️ INFO ] → ${msg}${loggerTheme.reset}`),
-
   warn: (msg) => console.log(`${loggerTheme.yellow}[ ⚠️ WARNING ] → ${msg}${loggerTheme.reset}`),
-
   error: (msg) => console.log(`${loggerTheme.red}[ ✖️ ERROR ] → ${msg}${loggerTheme.reset}`),
-
   success: (msg) => console.log(`${loggerTheme.green}[ ✔️ DONE ] → ${msg}${loggerTheme.reset}`),
-
   loading: (msg) => console.log(`${loggerTheme.cyan}[ ⌛️ LOADING ] → ${msg}${loggerTheme.reset}`),
-
   step: (msg) => console.log(`${loggerTheme.magenta}[ ➔ STEP ] → ${msg}${loggerTheme.reset}`),
-
   banner: () => fancyBox(' 🍉🍉 Free Plestine 🍉🍉', '— 19Seniman From Insider 🏴‍☠️ —'),
-
 };
 
 require('dotenv').config();
@@ -148,7 +117,6 @@ function getRandomDelay(minSec = 10, maxSec = 20) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-// Fungsi untuk mendapatkan nonce saat ini dari wallet
 async function getCurrentNonce(wallet) {
   return await wallet.provider.getTransactionCount(wallet.address, 'latest');
 }
@@ -170,7 +138,6 @@ async function main() {
     const router = new ethers.Contract(routerAddress, routerAbi, wallet);
     const dex = new ethers.Contract(zer0dexAddress, zer0dexAbi, wallet);
 
-    // Dapatkan nonce awal untuk wallet ini
     let currentNonce = await getCurrentNonce(wallet);
 
     // === SWAP ===
@@ -181,7 +148,7 @@ async function main() {
       const decimals = await token.decimals();
       const balance = await token.balanceOf(walletAddress);
       if (balance === 0n) {
-        console.log(`Saldo ${fromToken.symbol} kosong. Skip.`);
+        console.log(`Balance for ${fromToken.symbol} is empty. Skipping.`);
         continue;
       }
 
@@ -193,12 +160,12 @@ async function main() {
       if (allowance < amountIn) {
         console.log(`Approving ${fromToken.symbol}...`);
         try {
-          const approveTx = await token.approve(routerAddress, amountIn, { nonce: currentNonce++ }); // Gunakan nonce dan tingkatkan
+          const approveTx = await token.approve(routerAddress, amountIn, { nonce: currentNonce++ }); // Use nonce and increment
           await approveTx.wait();
           console.log(`✅ Approve Success! Tx Hash: ${approveTx.hash}`);
         } catch (err) {
-          console.error(`❌ Gagal approve ${fromToken.symbol}:`, err?.shortMessage || err);
-          // Mungkin perlu mencoba lagi atau skip transaksi ini jika approve gagal
+          console.error(`❌ Failed to approve ${fromToken.symbol}:`, err?.shortMessage || err);
+          // May need to retry or skip this transaction if approve fails
           continue; 
         }
       }
@@ -219,20 +186,20 @@ async function main() {
       console.log(`\u{1F501} Swap ${fromToken.symbol} → ${toToken.symbol} | Amount: ${ethers.formatUnits(amountIn, decimals)}`);
 
       try {
-        // Estimasi gas limit sebelum mengirim transaksi
+        // Estimate gas limit before sending the transaction
         const estimatedGas = await router.exactInputSingle.estimateGas(params);
-        // Tambahkan buffer ke gas limit yang diestimasi
-        const gasLimitWithBuffer = estimatedGas * 120n / 100n; // Tambah 20%
+        // Add a buffer to the estimated gas limit
+        const gasLimitWithBuffer = estimatedGas * 120n / 100n; // Add 20%
         
-        const tx = await router.exactInputSingle(params, { gasLimit: gasLimitWithBuffer, nonce: currentNonce++ }); // Gunakan nonce dan tingkatkan
+        const tx = await router.exactInputSingle(params, { gasLimit: gasLimitWithBuffer, nonce: currentNonce++ }); // Use nonce and increment
         const receipt = await tx.wait();
         console.log(`✅ Swap Success! Tx Hash: ${receipt.hash}`);
       } catch (err) {
-        console.error(`❌ Gagal swap ${fromToken.symbol} → ${toToken.symbol}:`, err?.shortMessage || err);
-        // Jika ada error REPLACEMENT_UNDERPRICED, bisa coba tingkatkan gasPrice/maxFeePerGas
-        // Atau Anda mungkin ingin mendapatkan nonce terbaru lagi jika terjadi error yang tidak terduga
+        console.error(`❌ Failed to swap ${fromToken.symbol} → ${toToken.symbol}:`, err?.shortMessage || err);
+        // If there is a REPLACEMENT_UNDERPRICED error, you can try increasing gasPrice/maxFeePerGas
+        // Or you might want to get the latest nonce again if an unexpected error occurs
         if (err.code === 'REPLACEMENT_UNDERPRICED') {
-            console.log("Mencoba mendapatkan nonce terbaru karena REPLACEMENT_UNDERPRICED...");
+            console.log("Attempting to get the latest nonce due to REPLACEMENT_UNDERPRICED...");
             currentNonce = await getCurrentNonce(wallet);
         }
       }
@@ -242,7 +209,7 @@ async function main() {
 
     // === MINT ===
     const totalRuns = Math.floor(Math.random() * 5) + 1;
-    console.log(`\n🔁 Mulai ${totalRuns} aksi add liquidity`);
+    console.log(`\n🔁 Starting ${totalRuns} add liquidity actions`);
 
     for (let r = 1; r <= totalRuns; r++) {
       const [name0, name1] = pairs[Math.floor(Math.random() * pairs.length)];
@@ -256,7 +223,7 @@ async function main() {
       const bal1 = await token1.balanceOf(walletAddress);
 
       if (bal0 === 0n || bal1 === 0n) {
-        console.log(`[${r}] ❌ Saldo ${name0}/${name1} kosong. Skip.`);
+        console.log(`[${r}] ❌ Balance for ${name0}/${name1} is empty. Skipping.`);
         continue;
       }
 
@@ -281,7 +248,7 @@ async function main() {
             await approveTx0.wait();
             console.log(`[${r}] ✅ Approve ${name0} Success! Tx Hash: ${approveTx0.hash}`);
         } else {
-            console.log(`[${r}] ${name0} sudah di-approve.`);
+            console.log(`[${r}] ${name0} is already approved.`);
         }
 
         // Approve token1
@@ -292,15 +259,15 @@ async function main() {
             await approveTx1.wait();
             console.log(`[${r}] ✅ Approve ${name1} Success! Tx Hash: ${approveTx1.hash}`);
         } else {
-            console.log(`[${r}] ${name1} sudah di-approve.`);
+            console.log(`[${r}] ${name1} is already approved.`);
         }
       } catch (err) {
-        console.error(`[${r}] ❌ Gagal approve token untuk mint:`, err?.shortMessage || err);
+        console.error(`[${r}] ❌ Failed to approve token for mint:`, err?.shortMessage || err);
         if (err.code === 'REPLACEMENT_UNDERPRICED') {
-            console.log("Mencoba mendapatkan nonce terbaru karena REPLACEMENT_UNDERPRICED...");
+            console.log("Attempting to get the latest nonce due to REPLACEMENT_UNDERPRICED...");
             currentNonce = await getCurrentNonce(wallet);
         }
-        continue; // Skip mint jika approve gagal
+        continue; // Skip mint if approve fails
       }
 
       const deadline = Math.floor(Date.now() / 1000) + 300;
@@ -320,18 +287,18 @@ async function main() {
       ];
 
       try {
-        // Estimasi gas limit sebelum mengirim transaksi mint
+        // Estimate gas limit before sending the mint transaction
         const estimatedGasMint = await dex.mint.estimateGas(mintParams);
-        const gasLimitMintWithBuffer = estimatedGasMint * 120n / 100n; // Tambah 20%
+        const gasLimitMintWithBuffer = estimatedGasMint * 120n / 100n; // Add 20%
 
-        const tx = await dex.mint(mintParams, { gasLimit: gasLimitMintWithBuffer, nonce: currentNonce++ }); // Gunakan nonce dan tingkatkan
-        console.log(`[${r}] 🚀 TX terkirim: ${tx.hash}`);
+        const tx = await dex.mint(mintParams, { gasLimit: gasLimitMintWithBuffer, nonce: currentNonce++ }); // Use nonce and increment
+        console.log(`[${r}] 🚀 TX sent: ${tx.hash}`);
         await tx.wait();
-        console.log(`[${r}] 🎉 Sukses!`);
+        console.log(`[${r}] 🎉 Success!`);
       } catch (err) {
-        console.error(`[${r}] ❌ Gagal mint:`, err?.shortMessage || err);
+        console.error(`[${r}] ❌ Failed to mint:`, err?.shortMessage || err);
         if (err.code === 'REPLACEMENT_UNDERPRICED') {
-            console.log("Mencoba mendapatkan nonce terbaru karena REPLACEMENT_UNDERPRICED...");
+            console.log("Attempting to get the latest nonce due to REPLACEMENT_UNDERPRICED...");
             currentNonce = await getCurrentNonce(wallet);
         }
       }
@@ -339,11 +306,39 @@ async function main() {
       if (r < totalRuns) await getRandomDelay();
     }
 
-    console.log(`\n✅ Semua aksi selesai untuk wallet ${walletAddress}`);
+    console.log(`\n✅ All actions completed for wallet ${walletAddress}`);
   }
 }
 
-main().catch((err) => {
-  console.error('Fatal error:', err);
-  process.exit(1);
-});
+// ===================================================================
+// === NEW SECTION FOR AUTOMATIC EXECUTION EVERY 6 HOURS ===
+// ===================================================================
+
+// Convert 6 hours to milliseconds: 6 * 60 * 60 * 1000 = 21,600,000 ms
+const SIX_HOURS_IN_MS = 6 * 60 * 60 * 1000;
+
+/**
+ * This function will run the main function, then schedule
+ * the next execution after 6 hours.
+ */
+const runAndScheduleNext = async () => {
+  try {
+    logger.banner();
+    logger.info(`🚀 Starting execution... Time: ${new Date().toLocaleString()}`);
+    
+    // Run the main script logic
+    await main();
+    
+    logger.success(`✅ Execution cycle finished.`);
+
+  } catch (error) {
+    logger.error('A fatal error occurred at the top level:', error);
+  } finally {
+    // Whatever happens (success or error), schedule the next execution.
+    logger.info(`⏰ Next execution scheduled in 6 hours.`);
+    setTimeout(runAndScheduleNext, SIX_HOURS_IN_MS);
+  }
+};
+
+// Start the cycle for the first time
+runAndScheduleNext();
