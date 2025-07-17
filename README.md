@@ -1,6 +1,6 @@
 
 
-![Zer0-Dex](https://raw.githubusercontent.com/yonarebahan/Zer0-Dex-Auto/main/Untitled.png)
+![Zer0-Dex](https://github.com/19seniman/0g-swap/blob/main/png/picture1)
 
 ##  🍉 Donate for  watermelon
 
